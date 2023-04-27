@@ -1,12 +1,53 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace lab2
 {
+
+
+    /*public class functionObject : parseObject
+    {
+        string name;
+        string returnType;
+        string[] arguments;
+
+        public functionObject(string name, string returnType, string[] arguments)
+        {
+            this.name = name;
+            this.returnType = returnType;
+            this.arguments = arguments;
+        }
+
+        public functionObject(string name, string returnType)
+        {
+            this.name = name;
+            this.returnType = returnType;
+        }
+    }
+
+    public class variableObject : parseObject
+    {
+        string name;
+        string type;
+
+        public variableObject(string name, string type)
+        {
+            this.name = name;
+            this.type = type;
+        }
+    }
+
+    public class ifObject : parseObject
+    {
+        string condition;
+        List<parseObject> body = new();
+    }*/
+
     class Program
     {
         private static String[] separators = { ";", "{", "}", ">", "<", "|", "&", "~", ":", ".", "#", "##", ",", "(", ")", "[", "]", "()", "[]" };
         private static String[] operators = { "&&", "||", "++", "--", "==", "<=", ">=", "!=", "*", "/", "%", "=", "+=", "*=", "/=", "-=", "+", "-" };
-        private static String[] keywords = { "print", "var", "val", "while", "if", "return", "count", "filter", "println", "listOf", "fun", "Int", "Array", "String", "List", "it" };
+        private static String[] keywords = { "print", "var", "val", "while", "if", "return", "count", "filter", "println", "listOf", "fun", "Int", "Array", "String", "List", "it", "else" };
         private static String[] words;
 
         private static List<String> variables = new();
@@ -18,10 +59,12 @@ namespace lab2
         private static List<String> storedChars = new();
         private static List<String> storedErrors = new();
 
+
+
         private static int lineNum;
         private static int charNum;
 
-        static void Main(string[] args)
+        static void Main()
         {
             String data = File.ReadAllText("file.txt") + "\n$~";
 
@@ -67,7 +110,7 @@ namespace lab2
                     }
                 }
 
-                if ((words[i] == "=" && words[i + 2] == "=") || (words[i] == "+" && words[i + 2] == "+") || (words[i] == "-" && words[i + 2] == "-") || (words[i] == "*" && words[i + 2] == "=") || (words[i] == "/" && words[i + 2] == "=") || (words[i] == "+" && words[i + 2] == "=") || (words[i] == "-" && words[i + 2] == "=") || (words[i] == "&" && words[i + 2] == "&") || (words[i] == "|" && words[i + 2] == "|") || (words[i] == "(" && words[i + 2] == ")") || (words[i] == "[" && words[i + 2] == "]") || (words[i] == "-" && words[i + 2] == "-") || (words[i] == "<" && words[i + 2] == "=") || (words[i] == ">" && words[i + 2] == "="))
+                if ((words[i] == "=" && words[i + 2] == "=") || (words[i] == "+" && words[i + 2] == "+") || (words[i] == "-" && words[i + 2] == "-") || (words[i] == "*" && words[i + 2] == "=") || (words[i] == "/" && words[i + 2] == "=") || (words[i] == "+" && words[i + 2] == "=") || (words[i] == "-" && words[i + 2] == "=") || (words[i] == "&" && words[i + 2] == "&") || (words[i] == "|" && words[i + 2] == "|") || (words[i] == "[" && words[i + 2] == "]") || (words[i] == "-" && words[i + 2] == "-") || (words[i] == "<" && words[i + 2] == "=") || (words[i] == ">" && words[i + 2] == "="))
                 {
                     words[i] += words[i + 2];
                     words[i + 2] = String.Empty;
@@ -107,23 +150,33 @@ namespace lab2
                         if (Char.IsDigit(words[i + 1][0]))
                         {
                             storedErrors.Add("Variable name can't start with digit on line " + (lineNum + 1) + " symbol " + (charNum + 5));
+                            Console.WriteLine(storedErrors[0]);
+                            return;
                         } 
                         else
                         {
+
                             variables.Add(words[i + 1]);
                         }
                     }
                     else
                     {
                         storedErrors.Add("Trying to declare existing variable " + words[i + 1] + " on line " + (lineNum + 1) + " symbol " + (charNum + 5));
+                        Console.WriteLine(storedErrors[0]);
+                        return;
                     }
                 }
 
                 if (words[i] == "fun")
                 {
+                    string funName;
+                    string returnType = "";
+                    string argument = "";
+
                     if (!variables.Contains(words[i + 1]))
                     {
                         variables.Add(words[i + 1]);
+                        funName = words[i + 1];
                         if (words[i + 2] == "(" && words[i + 3] != ")" && words[i + 4] == ":")
                         {
                             if (!variables.Contains(words[i + 3]))
@@ -131,10 +184,26 @@ namespace lab2
                                 variables.Add(words[i + 3]);
                             }
                         }
+
+                        int j = 3;
+                        int k = 1;
+                        while (words[i + j] != ")")
+                        {
+                            j++;
+                        }
+                        if (words[i + j + 2] == ":")
+                        {
+                            while (words[i + j + k + 2] != "{")
+                            {
+                                returnType += words[i + j + k++ + 2];
+                            }
+                        }
                     }
                     else
                     {
                         storedErrors.Add("Trying to declare existing function " + words[i + 1] + " on line " + (lineNum + 1) + " symbol " + (charNum + 5));
+                        Console.WriteLine(storedErrors[0]);
+                        return;
                     }
                 }
 
@@ -147,95 +216,108 @@ namespace lab2
                 if (operators.Contains(words[i]) && operators.Contains(words[i - u]))
                 {
                     storedErrors.Add("Incorrect operator " + words[i - u] + words[i] + " on line " + (lineNum + 1) + " symbol " + (charNum + 1));
+                    Console.WriteLine(storedErrors[0]);
+                    return;
                 }
 
-                if (words[i] == "if" && words[i + 2] != "(")
+                if (words[i] == "if" && (words[i + 2] != "(" || (words[i+2] == "(" && words[i+3] == ")")))
                 {
                     storedErrors.Add("Incorrect if statement on line " + (lineNum + 1) + " symbol " + (charNum + 5));
-                }
-
-                if (words[i] == "return" && !(variables.Contains(words[i + 1]) || Int32.TryParse(words[i + 1], out int temp)))
-                {
-                    storedErrors.Add("Incorrect return statement on line " + (lineNum + 1) + " symbol " + (charNum + 1));
                 }
                 CheckLexicalAnalyzer(words[i]);
             }
 
             if (storedErrors.Count > 0)
             {
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|              Errors              |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedErrors.Count; i++)
-                {
-                    Console.WriteLine(storedErrors[i]);
-                }
-                Console.WriteLine("------------------------------------\n");
+                Console.WriteLine(storedErrors[0]);
             }
             else
             {
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|             Keywords             |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedKeywords.Count; i++)
+                if (storedKeywords.Count > 0)
                 {
-                    Console.WriteLine(storedKeywords[i]);
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|             Keywords             |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedKeywords.Count; i++)
+                    {
+                        Console.WriteLine(storedKeywords[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
                 }
-                Console.WriteLine("------------------------------------\n");
 
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|            Operators             |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedOperators.Count; i++)
+                if (storedOperators.Count > 0)
                 {
-                    Console.WriteLine(storedOperators[i]);
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|            Operators             |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedOperators.Count; i++)
+                    {
+                        Console.WriteLine(storedOperators[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
                 }
-                Console.WriteLine("------------------------------------\n");
 
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|            Separators            |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedSeparators.Count; i++)
+                if (storedSeparators.Count > 0)
                 {
-                    Console.WriteLine(storedSeparators[i]);
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|            Separators            |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedSeparators.Count; i++)
+                    {
+                        Console.WriteLine(storedSeparators[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
                 }
-                Console.WriteLine("------------------------------------\n");
 
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|             Integers             |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedIntegers.Count; i++)
+                if (storedIntegers.Count > 0)
                 {
-                    Console.WriteLine(storedIntegers[i]);
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|             Integers             |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedIntegers.Count; i++)
+                    {
+                        Console.WriteLine(storedIntegers[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
                 }
-                Console.WriteLine("------------------------------------\n");
 
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|             Strings              |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedStrings.Count; i++)
+                if (storedStrings.Count > 0)
                 {
-                    Console.WriteLine(storedStrings[i]);
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|             Strings              |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedStrings.Count; i++)
+                    {
+                        Console.WriteLine(storedStrings[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
                 }
-                Console.WriteLine("------------------------------------\n");
+                
+                if (storedChars.Count > 0)
+                {
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|               Chars              |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < storedChars.Count; i++)
+                    {
+                        Console.WriteLine(storedChars[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
+                }
+                
+                if (variables.Count > 0)
+                {
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("|             Variables            |");
+                    Console.WriteLine("------------------------------------");
+                    for (int i = 0; i < variables.Count; i++)
+                    {
+                        Console.WriteLine(variables[i]);
+                    }
+                    Console.WriteLine("------------------------------------\n");
+                }
 
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|               Chars              |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < storedChars.Count; i++)
-                {
-                    Console.WriteLine(storedChars[i]);
-                }
-                Console.WriteLine("------------------------------------\n");
-
-                Console.WriteLine("------------------------------------");
-                Console.WriteLine("|             Variables            |");
-                Console.WriteLine("------------------------------------");
-                for (int i = 0; i < variables.Count; i++)
-                {
-                    Console.WriteLine(variables[i]);
-                }
-                Console.WriteLine("------------------------------------\n");
+                lab3.SyntaxAnalysis(words, variables);
             }
         }
 
@@ -275,9 +357,12 @@ namespace lab2
                     int intValue;
                     if (Int32.TryParse(str, out intValue) && !isCheck)
                     {
-                        storedIntegers.Add(str);
+                        if (!storedIntegers.Contains(str))
+                        {
+                            storedIntegers.Add(str);
+                            isCheck = true;
+                        }
                         //Console.WriteLine(" (integerValue, <" + str + ">) ");
-                        isCheck = true;
                     }
                     else if (str.Equals("\r") || str.Equals("\n") || str.Equals("\r\n")) { }
 

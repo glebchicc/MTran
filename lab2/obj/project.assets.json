@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\projects\\MTrab\\lab2\\lab2.csproj",
+      "projectUniqueName": "D:\\projects\\MTrab\\repo\\MTran\\lab2\\lab2.csproj",
       "projectName": "lab2",
-      "projectPath": "D:\\projects\\MTrab\\lab2\\lab2.csproj",
+      "projectPath": "D:\\projects\\MTrab\\repo\\MTran\\lab2\\lab2.csproj",
       "packagesPath": "C:\\Users\\GlebB\\.nuget\\packages\\",
-      "outputPath": "D:\\projects\\MTrab\\lab2\\obj\\",
+      "outputPath": "D:\\projects\\MTrab\\repo\\MTran\\lab2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\GlebB\\AppData\\Roaming\\NuGet\\NuGet.Config",
