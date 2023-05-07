@@ -1,53 +1,14 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace lab2
 {
-
-
-    /*public class functionObject : parseObject
-    {
-        string name;
-        string returnType;
-        string[] arguments;
-
-        public functionObject(string name, string returnType, string[] arguments)
-        {
-            this.name = name;
-            this.returnType = returnType;
-            this.arguments = arguments;
-        }
-
-        public functionObject(string name, string returnType)
-        {
-            this.name = name;
-            this.returnType = returnType;
-        }
-    }
-
-    public class variableObject : parseObject
-    {
-        string name;
-        string type;
-
-        public variableObject(string name, string type)
-        {
-            this.name = name;
-            this.type = type;
-        }
-    }
-
-    public class ifObject : parseObject
-    {
-        string condition;
-        List<parseObject> body = new();
-    }*/
-
-    class Program
+    class lab2
     {
         private static String[] separators = { ";", "{", "}", ">", "<", "|", "&", "~", ":", ".", "#", "##", ",", "(", ")", "[", "]", "()", "[]" };
         private static String[] operators = { "&&", "||", "++", "--", "==", "<=", ">=", "!=", "*", "/", "%", "=", "+=", "*=", "/=", "-=", "+", "-" };
-        private static String[] keywords = { "print", "var", "val", "while", "if", "return", "count", "filter", "println", "listOf", "fun", "Int", "Array", "String", "List", "it", "else" };
+        private static String[] keywords = { "print", "var", "val", "while", "if", "return", "count", "filter", "println", "listOf", "fun", "Int", "Array", "String", "List", "it", "else", "for", "in" };
         private static String[] words;
 
         private static List<String> variables = new();
@@ -58,8 +19,6 @@ namespace lab2
         private static List<String> storedStrings = new();
         private static List<String> storedChars = new();
         private static List<String> storedErrors = new();
-
-
 
         private static int lineNum;
         private static int charNum;
@@ -78,7 +37,10 @@ namespace lab2
             for (int i = 0; i < newData.Length; i++)
             {
                 if (newData[i] == '\n')
+                {
                     newData[i] = '#';
+                    newData = newData.Replace("#", " # ");
+                } 
             }
 
             data = newData.ToString();
@@ -86,7 +48,7 @@ namespace lab2
             data = data.Replace("\r", String.Empty);
             data = data.Replace("\t", String.Empty);
             data = data.Replace("$", String.Empty);
-            data = data.Replace("#", "\n");
+            //data = data.Replace("#", "\n");
             data = data.Replace("~", String.Empty);
             words = data.Split(' ');
 
@@ -126,21 +88,10 @@ namespace lab2
             {
                 charNum += words[i].Length;
 
-                if (words[i].Length > 0 && words[i][0] == '\n')
+                if (words[i] == "#")
                 {
-                    int j = 0;
-                    while (words[i].Length > j && words[i][j] == '\n')
-                    {
-                        lineNum++;
-                        charNum = 0;
-                        j++;
-                    }
-                    string replaceString = "\n";
-                    for (int k = 1; k > j; k++)
-                    {
-                        replaceString += "\n";
-                    }
-                    words[i] = words[i].Replace(replaceString, "");
+                    lineNum++;
+                    charNum = 0;
                 }
 
                 if (words[i] == "var" || words[i] == "val")
@@ -165,6 +116,21 @@ namespace lab2
                         Console.WriteLine(storedErrors[0]);
                         return;
                     }
+                }
+
+                if (words[i] == "for")
+                {
+                    if (words[i + 1] == "(")
+                    {
+                        variables.Add(words[i + 2]);
+                    }
+                    else
+                    {
+                        storedErrors.Add("Incorrect for statement" + " on line " + (lineNum + 1) + " symbol " + (charNum + 5));
+                        Console.WriteLine(storedErrors[0]);
+                        return;
+                    }
+                    
                 }
 
                 if (words[i] == "fun")
@@ -220,10 +186,10 @@ namespace lab2
                     return;
                 }
 
-                if (words[i] == "if" && (words[i + 2] != "(" || (words[i+2] == "(" && words[i+3] == ")")))
+                /*if (words[i] == "if" && (words[i + 2] != "(" || (words[i+2] == "(" && words[i+3] == ")")))
                 {
                     storedErrors.Add("Incorrect if statement on line " + (lineNum + 1) + " symbol " + (charNum + 5));
-                }
+                }*/
                 CheckLexicalAnalyzer(words[i]);
             }
 
@@ -318,6 +284,7 @@ namespace lab2
                 }
 
                 lab3.SyntaxAnalysis(words, variables);
+                //lab4.SemanticAnalisys(words, lab3.variableTypes);
             }
         }
 
