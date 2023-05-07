@@ -509,8 +509,8 @@ namespace lab2
                 }
             }
 
-            Console.WriteLine($"{startObject.name}: {startObject.value}");
-            OutputChildrenOfNode(startObject, 1);
+            //Console.WriteLine($"{startObject.name}: {startObject.value}");
+            //OutputChildrenOfNode(startObject, 1);
         }
 
         public static void OutputChildrenOfNode(parseObject parseObject, int numOfTubs)

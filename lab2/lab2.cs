@@ -199,7 +199,7 @@ namespace lab2
             }
             else
             {
-                if (storedKeywords.Count > 0)
+                /*if (storedKeywords.Count > 0)
                 {
                     Console.WriteLine("------------------------------------");
                     Console.WriteLine("|             Keywords             |");
@@ -281,10 +281,10 @@ namespace lab2
                         Console.WriteLine(variables[i]);
                     }
                     Console.WriteLine("------------------------------------\n");
-                }
+                }*/
 
                 lab3.SyntaxAnalysis(words, variables);
-                //lab4.SemanticAnalisys(words, lab3.variableTypes);
+                lab4.SemanticAnalisys(words, lab3.variableTypes);
             }
         }
 
