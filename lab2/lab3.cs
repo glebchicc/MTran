@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace lab2
+﻿namespace lab2
 {
     public class parseObject
     {

@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Text;
 
 namespace lab2
 {
@@ -283,8 +281,9 @@ namespace lab2
                     Console.WriteLine("------------------------------------\n");
                 }*/
 
-                lab3.SyntaxAnalysis(words, variables);
-                lab4.SemanticAnalisys(words, lab3.variableTypes);
+                //lab3.SyntaxAnalysis(words, variables);
+                //lab4.SemanticAnalisys(words, lab3.variableTypes);
+                lab5.Compiler(Path.Combine(Directory.GetCurrentDirectory(), "file.kt"), Path.Combine(Directory.GetCurrentDirectory(), "file.jar"));
             }
         }
 
