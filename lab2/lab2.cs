@@ -281,9 +281,9 @@ namespace lab2
                     Console.WriteLine("------------------------------------\n");
                 }*/
 
-                //lab3.SyntaxAnalysis(words, variables);
-                //lab4.SemanticAnalisys(words, lab3.variableTypes);
-                lab5.Compiler(Path.Combine(Directory.GetCurrentDirectory(), "file.kt"), Path.Combine(Directory.GetCurrentDirectory(), "file.jar"));
+                lab3.SyntaxAnalysis(words, variables);
+                lab4.SemanticAnalisys(words, lab3.variableTypes);
+                //lab5.Compiler(Path.Combine(Directory.GetCurrentDirectory(), "file.kt"), Path.Combine(Directory.GetCurrentDirectory(), "file.jar"));
             }
         }
 

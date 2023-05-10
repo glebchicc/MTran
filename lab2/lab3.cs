@@ -122,7 +122,10 @@
                             variableTypes.Add(words[i + 1], returnType);
                             //newObject.children.Add(new parseObject("Function type", returnType, new List<parseObject>()));
                         }
-                        else if (words[i + 2] == "(" && words[i + 3] == ")") { }
+                        else if (words[i + 2] == "(" && words[i + 3] == ")") 
+                        {
+                            variableTypes.Add(words[i + 1], "void");
+                        }
                         else
                         {
                             Console.WriteLine("Incorrect fun declaration: check () brackets on line" + (lineNum + 1) + " symbol " + (charNum + 1));

@@ -3,6 +3,9 @@
     internal class lab4
     {
         public static Dictionary<String, String> variables = new Dictionary<String, String>();
+        public static Dictionary<String, bool> isVarUsed = new Dictionary<String, bool>();
+        public static Dictionary<String, int> variableScope = new Dictionary<String, int>();
+
         private static String[] comparisonOperators = { "==", "<=", ">=", "!=", "<", ">" };
         private static String[] ariphmeticalOperators = { "+", "-", "*", "/" };
         private static string currentFunType = "";
@@ -11,13 +14,33 @@
         private static bool waitingForVariable = false;
         private static bool waitingForComparison = false;
 
+        private static int currentScope = 0;
+
         public static void SemanticAnalisys(String[] words, Dictionary<String, String> variables)
         {
             var newWords = words.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             words = newWords;
+            variableScope.Add("items", 0);
+            variableScope.Add("quicksort", 0);
+
+            foreach (var vars in variables.Keys) 
+            {
+                isVarUsed.Add(vars, false);
+            }
 
             for (int i = 0; i < words.Length; i++)
             {
+                if (words[i] == "{")
+                {
+                    currentScope += 1;
+                    continue;
+                }
+                else if (words[i] == "}")
+                {
+                    currentScope -= 1;
+                    continue;
+                }
+
                 int l = 0;
                 string currentType = "";
                 waitingForVariable = true;
@@ -50,6 +73,12 @@
                         {
                             if (variables.ContainsKey(words[i + 3 + l]))
                             {
+                                isVarUsed[words[i + 3 + l]] = true;
+                                if (!variableScope.TryGetValue(words[i + 3 + l], out _) || currentScope < variableScope[words[i + 3 + l]])
+                                {
+                                    Console.WriteLine("Semantic error: incorrect var statement, check scope of used var " + words[i + 3 + l]);
+                                    return;
+                                }
                                 if (currentType == "")
                                 {
                                     currentType = variables[words[i + 3 + l++]];
@@ -129,6 +158,11 @@
                             }
                             else if (ariphmeticalOperators.Contains(words[i + 3 + l]))
                             {
+                                if (words[i + 3 + l] == "/" && words[i + 4 + l] == "0")
+                                {
+                                    Console.WriteLine("Semantic error: incorrect var statement, dividing by zero");
+                                    return;
+                                }
                                 waitingForVariable = true;
                                 l++;
                             }
@@ -139,22 +173,60 @@
                             }
                         }
                     }
-                     variables.Add(words[i + 1], currentType);
+                    variables.Add(words[i + 1], currentType);
+                    isVarUsed.Add(words[i + 1], false);
+                    variableScope.Add(words[i + 1], currentScope);
                 }
             }
 
             for (int i = 0; i < words.Length; i++)
             {
+                if (words[i] == "{")
+                {
+                    currentScope += 1;
+                    continue;
+                }
+                else if (words[i] == "}")
+                {
+                    currentScope -= 1;
+                    continue;
+                }
+
                 if (words[i] == "fun")
                 {
                     if (variables.TryGetValue(words[i + 1], out _))
                     {
                         currentFunType = variables[words[i + 1]];
+                        variableScope.Clear();
+                        variableScope.Add(words[i + 1], 0);
+                        variableScope.Add("items", 0);
                     }
                     else
                     {
                         Console.WriteLine("Seems like code have been changes after syntax and before semantic analysises. Please try again.");
                         return;
+                    }
+                }
+
+                if (words[i] == "var" || words[i] == "val")
+                {
+                    variableScope.Add(words[i + 1], currentScope);
+                }
+
+                if (words[i] == "println")
+                {
+                    if (isVarUsed.TryGetValue(words[i + 2], out _))
+                    {
+                        isVarUsed[words[i + 2]] = true;
+                    }
+                    
+                    if (words[i + 2][0] != '"')
+                    {
+                        if (!variableScope.TryGetValue(words[i + 2], out _) || currentScope < variableScope[words[i + 2]])
+                        {
+                            Console.WriteLine("Semantic error: incorrect var statement, check scope of used var " + words[i + 2]);
+                            return;
+                        }
                     }
                 }
 
@@ -185,11 +257,22 @@
                         {
                             if (variables.ContainsKey(words[i + 2 + l]))
                             {
+                                isVarUsed[words[i + 2 + l]] = true;
+                                if (!variableScope.TryGetValue(words[i + 2 + l], out _) || currentScope < variableScope[words[i + 2 + l]])
+                                {
+                                    Console.WriteLine("Semantic error: incorrect var statement, check scope of used var " + words[i + 2 + l]);
+                                    return;
+                                }
                                 currentType = variables[words[i + 2 + l++]];
                                 waitingForVariable = false;
                             }
                             else if (int.TryParse(words[i + 2 + l], out _))
                             {
+                                if (words[i + 2 + l] == "/" && words[i + 3 + l] == "0")
+                                {
+                                    Console.WriteLine("Semantic error: incorrect if statement, dividing by zero");
+                                    return;
+                                }
                                 currentType = "Int";
                             }
                             else
@@ -236,11 +319,22 @@
                         {
                             if (variables.ContainsKey(words[i + 2 + l]))
                             {
+                                isVarUsed[words[i + 2 + l]] = true;
+                                if (!variableScope.TryGetValue(words[i + 2 + l], out _) || currentScope < variableScope[words[i + 2 + l]])
+                                {
+                                    Console.WriteLine("Semantic error: incorrect var statement, check scope of used var " + words[i + 2 + l]);
+                                    return;
+                                }
                                 currentType = variables[words[i + 2 + l++]];
                                 waitingForVariable = false;
                             }
                             else if (int.TryParse(words[i + 2 + l], out _))
                             {
+                                if (words[i + 2 + l] == "/" && words[i + 3 + l] == "0")
+                                {
+                                    Console.WriteLine("Semantic error: incorrect var statement, dividing by zero");
+                                    return;
+                                }
                                 currentType = "Int";
                                 l++;
                             }
@@ -299,6 +393,12 @@
                         {
                             if (variables.ContainsKey(words[i + 1 + l]))
                             {
+                                isVarUsed[words[i + 1 + l]] = true;
+                                if (!variableScope.TryGetValue(words[i + 1 + l], out _) || currentScope < variableScope[words[i + 1 + l]])
+                                {
+                                    Console.WriteLine("Semantic error: incorrect return statement, check scope of used var " + words[i + 1 + l]);
+                                    return;
+                                }
                                 if (currentType == "")
                                 {
                                     currentType = variables[words[i + 1 + l++]];
@@ -314,6 +414,11 @@
                                 if (currentType == "")
                                 {
                                     currentType = "Int";
+                                }
+                                if (words[i + 3 + l] == "/" && words[i + 4 + l] == "0")
+                                {
+                                    Console.WriteLine("Semantic error: incorrect return statement, dividing by zero");
+                                    return;
                                 }
                                 l++;
                             }
@@ -341,6 +446,11 @@
                             }
                             else if (ariphmeticalOperators.Contains(words[i + 1 + l]))
                             {
+                                if (words[i + 1 + l] == "/" && words[i + 2 + l] == "0")
+                                {
+                                    Console.WriteLine("Semantic error: incorrect return statement, dividing by zero");
+                                    return;
+                                }
                                 types.Add(currentType);
                                 currentType = "";
                                 waitingForVariable = true;
@@ -370,6 +480,15 @@
                         Console.WriteLine("Semantic error: incorrect return statement, trying to return variable of incorrect type");
                         return;
                     }
+                }
+            }
+
+            foreach (var key in isVarUsed.Keys)
+            {
+                if (!isVarUsed[key] && key != "main") 
+                {
+                    Console.WriteLine("Semantic error: unused variable " + key);
+                    return;
                 }
             }
             Console.WriteLine("No semantic errors found.");
